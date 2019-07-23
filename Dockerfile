@@ -33,7 +33,7 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MPI_HOME/lib
 COPY src/simple-mpi-test.c /usr/local/src/
 RUN mpicc -o /usr/local/bin/simple-mpi-test /usr/local/src/simple-mpi-test.c
 RUN apt-get install -y openssh-client
-RUN mpirun --allow-run-as-root -np 4 /usr/local/bin/simple-mpi-test
+RUN mpirun --allow-run-as-root -np 2 /usr/local/bin/simple-mpi-test
 
 ## BLAS
 WORKDIR /usr/local/mkl 
