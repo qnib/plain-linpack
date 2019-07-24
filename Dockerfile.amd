@@ -30,7 +30,8 @@ RUN echo ">> CFLAGS=${CFLAGS}" \
  && make install
 ENV MPI_HOME=/usr/local/openmpi
 ENV PATH=$PATH:$MPI_HOME/bin
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MPI_HOME/lib
+ENV LD_LIBRARY_PATH=$MPI_HOME/lib
+ENV C_INCLUDE_PATH=$MPI_HOME/include/
 COPY src/simple-mpi-test.c /usr/local/src/
 RUN mpicc -o /usr/local/bin/simple-mpi-test /usr/local/src/simple-mpi-test.c
 RUN apt-get install -y openssh-client
@@ -57,7 +58,9 @@ COPY make/Make.Linux_AMD_BLIS .
 RUN ln -s /usr/local/blis-mt/lib/libblis.a /usr/local/blis-mt/lib/libblis-mt.a 
 RUN make arch=Linux_AMD_BLIS
 WORKDIR /opt/hpl
-COPY hpl/HPL.dat.tmpl HPL.dat
 RUN cp /usr/local/src/hpl/bin/Linux_AMD_BLIS/xhpl .
 COPY hpl/bench.sh /usr/local/bin
 CMD ["/usr/local/bin/bench.sh"]
+COPY ./confd /etc/confd
+COPY ./env/* .
+ENV HPL_ENV_FILE=r2700x.sh
