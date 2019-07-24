@@ -2,7 +2,8 @@
 HPL Benchmark in a container
 
 ### Ryzen 7 2700X
-#### native-auto
+
+**Image**: qnib/plain-linpack:native_zen.2019-07-24.1
 
 |   N   |  NB | P | Q | #MPI | #OMP | Time | Gflops | Comments |
 | 29464 | 232 | 4 | 2 |   8  |   1  |  | 188    | |
@@ -15,3 +16,8 @@ HPL Benchmark in a container
 | 28032 | 192 | 2 | 4 |   8  |   2  |  | 187 | |
 | 29464 | 232 | 2 | 4 |   8  |   2  | 89.11 | 191 | privileged |
 | 29464 | 232 | 2 | 4 |   8  |   2  | 92.48 |  184 | |
+
+**Image**: qnib/plain-linpack:znver1_zen.2019-07-24.1
+|   N   |  NB | P | Q | #MPI | #OMP | Time | Gflops | Comments |
+| 29464 | 232 | 2 | 4 |   8  |   1  | 89.11 | 191 | privileged |
+
