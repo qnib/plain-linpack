@@ -1,0 +1,24 @@
+ARG DOCKER_REGISTRY=docker.io
+ARG FROM_IMG_REPO=qnib
+ARG FROM_IMG_NAME="plain-linpack-libs"
+ARG FROM_BASE_TAG="ubuntu"
+ARG FROM_IMG_TAG="latest"
+ARG FROM_IMG_HASH=""
+FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_BASE_TAG}_${FROM_IMG_TAG}${DOCKER_IMG_HASH}
+
+ARG NUM_THREADS=2
+ARG CFLAGS_MARCH="skylake"
+ARG CFLAGS_OPT="fast"
+ENV CFLAGS="-O${CFLAGS_OPT} -march=${CFLAGS_MARCH}" 
+
+## HPL
+ARG HPL_VER=2.3
+WORKDIR /usr/local/src/hpl
+RUN echo ">> wget -q http://www.netlib.org/benchmark/hpl/hpl-${HPL_VER}.tar.gz" \
+ && wget -qO- http://www.netlib.org/benchmark/hpl/hpl-${HPL_VER}.tar.gz |tar xfz - --strip-components=1
+ARG HPL_ARCH=Linux_INTEL_OBLAS
+COPY make/Make.${HPL_ARCH} .
+RUN make arch=${HPL_ARCH}
+WORKDIR /opt/hpl
+ENV LD_LIBRARY_PATH=/opt/OpenBLAS/lib/:/usr/local/openmpi/lib/
+RUN cp /usr/local/src/hpl/bin/${HPL_ARCH}/xhpl /opt/hpl/

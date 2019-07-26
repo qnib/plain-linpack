@@ -1,0 +1,48 @@
+ARG DOCKER_REGISTRY=docker.io
+ARG FROM_IMG_REPO=qnib
+ARG FROM_IMG_NAME="plain-linpack-base"
+ARG FROM_BASE_TAG="ubuntu"
+ARG FROM_IMG_TAG="2019-07-26.1"
+ARG FROM_IMG_HASH=""
+FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_BASE_TAG}_${FROM_IMG_TAG}${DOCKER_IMG_HASH}
+
+ARG NUM_THREADS=2
+ARG CFLAGS_MARCH="core2"
+ARG BLAS_TARGET=""
+ARG CFLAGS_OPT="fast"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    DEBCONF_NONINTERACTIVE_SEEN=true
+
+RUN apt-get update \
+ && apt-get install -y build-essential hwloc libhwloc-dev libevent-dev autoconf automake gfortran cpio vim
+ENV CFLAGS="-O${CFLAGS_OPT} -march=${CFLAGS_MARCH}" 
+RUN apt-get install -y wget ca-certificates
+## OpenMPI
+WORKDIR /usr/local/src/openmpi
+RUN wget -qO- https://download.open-mpi.org/release/open-mpi/v3.1/openmpi-3.1.4.tar.bz2 \
+ |tar xfj - -C . --strip-components=1
+## TODO: Enable PMI
+RUN echo ">> CFLAGS=${CFLAGS}" \
+ && echo ">> ./configure --prefix=/usr/local/ && make -j ${NUM_THREADS} && make install " \
+ && ./configure --prefix=/usr/local/openmpi \
+ && make -j ${NUM_THREADS} \
+ && make install
+ENV MPI_HOME=/usr/local/openmpi
+ENV PATH=$PATH:$MPI_HOME/bin
+ENV LD_LIBRARY_PATH=$MPI_HOME/lib
+ENV C_INCLUDE_PATH=$MPI_HOME/include/
+COPY src/simple-mpi-test.c /usr/local/src/
+RUN mpicc -o /usr/local/bin/simple-mpi-test /usr/local/src/simple-mpi-test.c
+RUN apt-get install -y openssh-client
+RUN mpirun --allow-run-as-root -np 2 /usr/local/bin/simple-mpi-test
+
+## blas
+WORKDIR /usr/local/src/blas
+ARG BLAS_VER=0.3.6
+RUN wget -qO- https://github.com/xianyi/OpenBLAS/archive/v${BLAS_VER}.tar.gz |tar xfz - --strip-components=1
+RUN echo ">> CFLAGS=${CFLAGS}" \
+ && set -x \
+ && if [[ -z ${BLAS_TARGET} ]];then make -j ${NUM_THREADS} ;else make -j ${NUM_THREADS} TARGET=${BLAS_TARGET};fi \
+ && set -x \
+ && make install
