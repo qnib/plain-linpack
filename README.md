@@ -1,23 +1,15 @@
 # plain-linpack
 HPL Benchmark in a container
 
-### Ryzen 7 2700X
+## Variants
 
-**Image**: qnib/plain-linpack:native_zen.2019-07-24.1
+### Dockerfile.amd
+An image that aims to use the AMD libraries and compiles HPL from scratch.
+Even though it works, it should have a lot of headroom to be optimized (as of 2019-07-25).
 
-|   N   |  NB | P | Q | #MPI | #OMP | Time | Gflops | Comments |
-| 29464 | 232 | 4 | 2 |   8  |   1  |  | 188    | |
-| 52000 | 32  | 2 | 4 |   8  |   1  |  | 80    | |
-| 28160 | 32  | 2 | 4 |   8  |   2  |  | 77    | |
-| 28160 | 64  | 2 | 4 |   8  |   2  |  | 136 | |
-| 28160 | 256 | 2 | 4 |   8  |   2  |  | 184 | |
-| 28160 | 256 | 4 | 2 |   8  |   2  |  | 180 | |
-| 28160 | 512 | 2 | 4 |   8  |   2  |  | 175 | |
-| 28032 | 192 | 2 | 4 |   8  |   2  |  | 187 | |
-| 29464 | 232 | 2 | 4 |   8  |   2  | 89.11 | 191 | privileged |
-| 29464 | 232 | 2 | 4 |   8  |   2  | 92.48 |  184 | |
+### Dockerfile.ihpl
+To build the image downloading the [INTEL Optimized Linpack](https://software.intel.com/en-us/articles/intel-mkl-benchmarks-suite) is needed. Place the `tgz` in the `./src` folder.
 
-**Image**: qnib/plain-linpack:znver1_zen.2019-07-24.1
-|   N   |  NB | P | Q | #MPI | #OMP | Time | Gflops | Comments |
-| 29464 | 232 | 2 | 4 |   8  |   1  | 89.11 | 191 | privileged |
+### Dockerfile.intel
+Like the amd one, this Dockerfile aims to compile everything from scratch.
 

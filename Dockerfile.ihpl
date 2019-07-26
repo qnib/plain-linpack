@@ -1,0 +1,8 @@
+FROM centos:7.6.1810 AS untar
+
+ADD src/l_mklb_p_2019.4.003.tgz /
+
+FROM centos:7.6.1810 
+COPY --from=untar /l_mklb_p_2019.4.003/benchmarks_2019/linux/mkl/benchmarks/linpack/ /opt/linpack
+WORKDIR /opt/linpack
+CMD ["/opt/linpack/runme_xeon64"]

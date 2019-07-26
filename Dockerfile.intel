@@ -1,0 +1,26 @@
+FROM centos:7.6.1810
+
+RUN yum-config-manager --add-repo https://yum.repos.intel.com/setup/intelproducts.repo
+RUN yum-config-manager --add-repo https://yum.repos.intel.com/mpi/setup/intel-mpi.repo
+RUN yum-config-manager --add-repo https://yum.repos.intel.com/mkl/setup/intel-mkl.repo
+RUN yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
+RUN rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+RUN yum update -y
+RUN yum install -y intel-mkl-2019.4-070
+RUN yum install -y intel-mpi-2019.4-070
+
+RUN yum groupinstall -y 'Development Tools'
+## HPL
+ARG NUM_THREADS=2
+ARG CFLAGS_MARCH="skylake"
+ARG CFLAGS_OPT="3"
+ENV CFLAGS="-O${CFLAGS_OPT} -march=${CFLAGS_MARCH}" 
+RUN yum install -y wget
+ARG HPL_VER=2.3
+WORKDIR /usr/local/src/hpl
+#RUN echo ">> wget -q http://www.netlib.org/benchmark/hpl/hpl-${HPL_VER}.tar.gz" \
+# && wget -qO- http://www.netlib.org/benchmark/hpl/hpl-${HPL_VER}.tar.gz |tar xfz - --strip-components=1
+#COPY ./make/Make.Linux_INTEL_MKL /usr/local/src/hpl/
+#ENV LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2019.4.243/linux/mpi/intel64/lib/release/
+#RUN make arch=Linux_INTEL_MKL
+ADD l_mklb_p_2019.4.003.tgz /
